@@ -25,8 +25,6 @@ class MyApp extends StatelessWidget {
 ## TextBoxScreen
 
 ```dart
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 
 class TextBoxScreen extends StatefulWidget {
