@@ -115,3 +115,39 @@ class _TodoScreenState extends State<TodoScreen> {
 }
 
 ```
+
+
+## todo.dart
+
+```dart
+class TodoItem {
+  String title;
+  String description;
+
+  TodoItem({required this.title, required this.description});
+
+  String toString() {
+    return 'TodoItem{title: $title, description: $description}';
+  }
+}
+
+class TodoList {
+  List<TodoItem> todoItems = [];
+
+  void addTodo(TodoItem todoItem) {
+    todoItems.add(todoItem);
+  }
+
+  void removeTodo(TodoItem todoItem) {
+    todoItems.remove(todoItem);
+  }
+
+  void printTodoList() {
+    for (int i = 0; i < todoItems.length; i++) {
+      print('${todoItems[i]}');
+    }
+  }
+}
+
+
+```
