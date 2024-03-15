@@ -47,9 +47,15 @@ class _TodoScreenState extends State<TodoScreen> {
           child: ListView.builder(
             itemCount: todos.todoItems.length,
             itemBuilder: (context, index) {
-              return ListTile(
-                title: Text(todos.todoItems[index].title),
-                subtitle: Text(todos.todoItems[index].description),
+              return Dismissible(
+                key: ValueKey(todos.todoItems[index]),
+                onDismissed: (direction) {
+                  todos.removeTodo(todos.todoItems[index]);
+                },
+                child: ListTile(
+                  title: Text(todos.todoItems[index].title),
+                  subtitle: Text(todos.todoItems[index].description),
+                ),
               );
             },
           ),
@@ -100,6 +106,8 @@ class _TodoScreenState extends State<TodoScreen> {
                       description: descriptionController.text,
                     ),
                   );
+                  titleController.clear();
+                  descriptionController.clear();
                 });
               },
               child: Text('Add'),
