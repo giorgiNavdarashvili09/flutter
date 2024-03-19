@@ -297,3 +297,445 @@ class _TodoScreenState extends State<TodoScreen> {
 }
 
 ```
+
+ახლა Column ვიჯეტს დავამატებთ მეორე 'შვილ' ვიჯეტს Row_ს, რომლის შიგნითაც გვექნება ახალი ელემენტის დამატებისათვის საჭირო ვიჯეტები.
+
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:todo/todo.dart';
+
+class TodoScreen extends StatefulWidget {
+  @override
+  State<TodoScreen> createState() {
+    return _TodoScreenState();
+  }
+}
+
+class _TodoScreenState extends State<TodoScreen> {
+  TodoList todos = TodoList();
+
+  @override
+  Widget build(BuildContext context) {
+    todos.addTodo(TodoItem(
+      title: 'title1',
+      description: 'description1',
+    ));
+    todos.addTodo(TodoItem(
+      title: 'title2',
+      description: 'description2',
+    ));
+    todos.addTodo(TodoItem(
+      title: 'title3',
+      description: 'description3',
+    ));
+
+    return Column(
+      children: [
+        Expanded(
+          child: ListView.builder(
+            itemCount: todos.todoItems.length,
+            itemBuilder: (context, index) {
+              return ListTile(
+                title: Text(todos.todoItems[index].title),
+                subtitle: Text(todos.todoItems[index].description),
+              );
+            },
+          ),
+        ),
+        Row(
+          children: [
+            Expanded(
+              child: Column(
+                children: [
+                  TextField(),
+                  TextField(),
+                ],
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {},
+              child: Text('Add'),
+            )
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+
+```
+
+როგორც უკვე ვთქვით დავამატეთ Row ვიჯეტი რომელშიც:
+- გვაქვს Column ვიჯეტი და ElevatedButton ვიჯეტი
+- Column ვიჯეტში თავის მხრივ გვაქვს ორი TextField ვიჯეტი
+- Column ვიჯეტი ჩავსვით Expanded ვიჯეტში. როგორც ListView ვიჯეტი TextField ვიჯეტებიც ცდილობენ მთლიანი ჰორიზონტალური სივრცის დაკავებას. 
+
+სანამ ახალი ელემენტის დამატების ფუნქციონალზე გადავალთ, მოდით გავაუმჯობესოთ ახლად დამატებული ვიჯეტების დიზაინი.
+- TextField ვიჯეტებს გადავცეთ decoration პარამეტრი
+- მარჯინების დასამატებლად დავამატოთ რამდენიმე SizedBox ვიჯეტი
+
+ამ ცვლილებების შემდეგ ჩვენი აპლიკაციის კოდი ასე გამოიყურება:
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:todo/todo.dart';
+
+class TodoScreen extends StatefulWidget {
+  @override
+  State<TodoScreen> createState() {
+    return _TodoScreenState();
+  }
+}
+
+class _TodoScreenState extends State<TodoScreen> {
+  TodoList todos = TodoList();
+
+  @override
+  Widget build(BuildContext context) {
+    todos.addTodo(TodoItem(
+      title: 'title1',
+      description: 'description1',
+    ));
+    todos.addTodo(TodoItem(
+      title: 'title2',
+      description: 'description2',
+    ));
+    todos.addTodo(TodoItem(
+      title: 'title3',
+      description: 'description3',
+    ));
+
+    return Column(
+      children: [
+        Expanded(
+          child: ListView.builder(
+            itemCount: todos.todoItems.length,
+            itemBuilder: (context, index) {
+              return ListTile(
+                title: Text(todos.todoItems[index].title),
+                subtitle: Text(todos.todoItems[index].description),
+              );
+            },
+          ),
+        ),
+        Row(
+          children: [
+            SizedBox(
+              width: 24,
+            ),
+            Expanded(
+              child: Column(
+                children: [
+                  TextField(
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(),
+                      label: Text('Title'),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 24,
+                  ),
+                  TextField(
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(),
+                      label: Text('Description'),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(
+              width: 12,
+            ),
+            ElevatedButton(
+              onPressed: () {},
+              child: Text('Add'),
+            ),
+            SizedBox(
+              width: 24,
+            ),
+          ],
+        ),
+        SizedBox(
+          height: 24,
+        ),
+      ],
+    );
+  }
+}
+
+
+```
+
+ხოლო აპლიკაციის ვიზუალი ასე:
+![](assets/image1.png)
+
+ახლა უკვე შეგვიძლია წავშალოთ სატესტო ListView_ს ელემენტები და მივცეთ მომხმარებელს საშვალება დაამატორს ახალი ელემენტი:
+- შევქმნით ორ ცვლადს, რომლებშიც შევინახავთ TextEditingController ობიექტებს სათაურისა და აღწერის TextField ვიჯეტებისათვის.
+- TextField ვიჯეტებს გადავცემთ შესაბამის TextEditingController ობიექტებს controller პარამეტრში
+- 'Add' ღილაკის onPressed ფუნქციაში setState ფუნქციის გამოყნებით, ჩვენს TodoList ობიექტში დავამატებთ ახალ TodoItem ობიექტს.
+
+ამ ცვლილებების შეტანის შემდეგ ჩვენი კოდი ასე გამოიყურება:
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:todo/todo.dart';
+
+class TodoScreen extends StatefulWidget {
+  @override
+  State<TodoScreen> createState() {
+    return _TodoScreenState();
+  }
+}
+
+class _TodoScreenState extends State<TodoScreen> {
+  TodoList todos = TodoList();
+  TextEditingController titleController = TextEditingController();
+  TextEditingController descriptionController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Expanded(
+          child: ListView.builder(
+            itemCount: todos.todoItems.length,
+            itemBuilder: (context, index) {
+              return ListTile(
+                title: Text(todos.todoItems[index].title),
+                subtitle: Text(todos.todoItems[index].description),
+              );
+            },
+          ),
+        ),
+        Row(
+          children: [
+            SizedBox(
+              width: 24,
+            ),
+            Expanded(
+              child: Column(
+                children: [
+                  TextField(
+                    controller: titleController,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(),
+                      label: Text('Title'),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 24,
+                  ),
+                  TextField(
+                    controller: descriptionController,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(),
+                      label: Text('Description'),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(
+              width: 12,
+            ),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  todos.addTodo(
+                    TodoItem(
+                      title: titleController.text,
+                      description: descriptionController.text,
+                    ),
+                  );
+                });
+              },
+              child: Text('Add'),
+            ),
+            SizedBox(
+              width: 24,
+            ),
+          ],
+        ),
+        SizedBox(
+          height: 24,
+        ),
+      ],
+    );
+  }
+}
+
+```
+
+ListView_ში ახალი ელემენტის დამატება უკვე შეგვიძლია, თუმცა კიდევ ორი მნიშვნელოვანი გაუმჯობესება შეგვიძლია შევიტანოთ ჩვენს აპლიკაციაში
+- პირველ რიგში, ახალი ელემენტის დამატების შემდეგ TextField ვიჯეტები უნდა გასუფთავდეს.
+- უნდა შეგვეძლოს ListView_ს ელემენტების წაშლა
+
+TextField ვიჯეტების გასუფთავება საკმაოდ მარტივი ამოცანაა. TextEditingController ობიექტებზე შეგვიძლია გამოვიძახოთ clear() ფუნქცია. მნიშვნელოვანია რომ TextField ვიჯეტების გასუფთავება მას შემდეგ მოვახდინოთ რაც ახალი TodoItem ობიექტი უკვე შექმნილია. წინააღმდეგ შემთხვევაში ListView_ში ცარიელი ელემენტი დაემატება. ამ ცვლილების შეტანის შემდეგ 'Add' ღილაკის onPressed ფუნქცია ასე გამოიყურება:
+
+
+```dart
+    onPressed: () {
+      setState(() {
+        todos.addTodo(
+          TodoItem(
+            title: titleController.text,
+            description: descriptionController.text,
+          ),
+        );
+        titleController.clear();
+        descriptionController.clear();
+      });
+    },
+```
+
+## Dismissible ვიჯეტი
+
+Flutter_ში ListView_ს ელემენტის წაშლა საკმაოდ მარტივი პროცესია. ამისთვის შეგვიძლია ის ვიჯეტი, რომელსაც ListView_ს ელემენტების დასახატად ვიყენებთ (ჩვენს შემთხვევაში ListTile ვიჯეტი) ჩავსვათ Dismissible ვიჯეტში. იმისათვის, რომ Dismissible ვიჯეტმა იმუშაოს ორი რამ უნდა გავითვალისწინოთ.
+1. Dismissible ვიჯეტს სჭირდება key პარამეტრი. key პარამეტრის დახმარებით Flutter_ი შეძლებს განასხვაოს ListView_ს ელემენტები ერთმანეთისაგან.
+2. Dismissible ვიჯეტს უნდა გადავცეთ onDismissed ფუნქცია, რომელშიც ListView_ს ინფორმაციის წყაროში, უნდა წავშალოთ შესაბამისი ელემენტიც.
+
+ჯერ მოდით ვნახოთ Dismissible ვიჯეტი ზემოთხსენებული პარამეტრებით და შემდეგ უფრო დეტალურად ვისაუბროთ მათზე:
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:todo/todo.dart';
+
+class TodoScreen extends StatefulWidget {
+  @override
+  State<TodoScreen> createState() {
+    return _TodoScreenState();
+  }
+}
+
+class _TodoScreenState extends State<TodoScreen> {
+  TodoList todos = TodoList();
+  TextEditingController titleController = TextEditingController();
+  TextEditingController descriptionController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Expanded(
+          child: ListView.builder(
+            itemCount: todos.todoItems.length,
+            itemBuilder: (context, index) {
+              return Dismissible(
+                key: ValueKey(todos.todoItems[index]),
+                onDismissed: (direction) {
+                  todos.removeTodo(todos.todoItems[index]);
+                },
+                child: ListTile(
+                  title: Text(todos.todoItems[index].title),
+                  subtitle: Text(todos.todoItems[index].description),
+                ),
+              );
+            },
+          ),
+        ),
+        Row(
+          children: [
+            SizedBox(
+              width: 24,
+            ),
+            Expanded(
+              child: Column(
+                children: [
+                  TextField(
+                    controller: titleController,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(),
+                      label: Text('Title'),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 24,
+                  ),
+                  TextField(
+                    controller: descriptionController,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(),
+                      label: Text('Description'),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(
+              width: 12,
+            ),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  todos.addTodo(
+                    TodoItem(
+                      title: titleController.text,
+                      description: descriptionController.text,
+                    ),
+                  );
+                  titleController.clear();
+                  descriptionController.clear();
+                });
+              },
+              child: Text('Add'),
+            ),
+            SizedBox(
+              width: 24,
+            ),
+          ],
+        ),
+        SizedBox(
+          height: 24,
+        ),
+      ],
+    );
+  }
+}
+
+```
+
+შეტანილი ცვლილებების შემდეგ ჩვენ უკვე შეგვიძლია ListView_ს ელემენტების წაშლა, ამ ელემენტზე თითის გასმით. 
+Dismissible ვიჯეტს როგორც ვთქვით სჭირდება key პარამეტრი. აქ ჩვენ გადავეცით ValueKey ობიექტი. ValueKey არის ისეთი ობიექტი, რომელსაც შეგვიძლია გადავცეთ რაიმე უნიკალური(განსხვავებული) ინფორმაცია, რის საშვალებითაც ValueKey ობიექტი დააგენერირებს 'გასაღებს' რაც ყველა ListTile ვიჯეტს გახდის უნიკალურს. ValueKey ობიექტს ჩვენ გადავეცით TodoItem ობიექტი. ამის მიზეზი მარტივია დარტში ყველა ობიექტი არის უნიკალური.
+
+რაც შეეხება onDismissed ფუნქციას. პირველ რიგში ამ ფუნქციას Flutter_ი გამოძახებისას გადმოაწვდის dirrection პარამეტრს, რომლის დახმარებით საშვალება გვაქვს სხვადასხვა ფუნქციონალი შევასრულოთ იმის მიხედვით რომელი მიმართულებით 'გაუსმევს' მომხმარებელი თითს. ამ ფუნქციის ტანში კი ჩვენ აუცილებლად უნდა წავშალოთ ის ინფორმაცია, რომელიც ვიზუალურად გაქრა ეკრანიდან.
+
+კარგი იქნებოდა თუკი ჩვენს TodoList კლასში გვექნებოდა ფუნქცია, რომელიც საშვალებას მოგვცემდა წაგვეშალა სიის ელემენტი მისი ინდექსის დახმარებით. მოდით დავამატოთ ეს ფუნქცია და შემდეგ გამოვიყენოთ ჩვენს აპლიკაციაში:
+
+```dart
+
+class TodoList {
+  List<TodoItem> todoItems = [];
+
+  void addTodo(TodoItem todoItem) {
+    todoItems.add(todoItem);
+  }
+
+  void removeTodo(TodoItem todoItem) {
+    todoItems.remove(todoItem);
+  }
+
+  void removeTodoAt(int index) {
+    todoItems.removeAt(index); 
+  }
+
+  void printTodoList() {
+    for (int i = 0; i < todoItems.length; i++) {
+      print('${todoItems[i]}');
+    }
+  }
+}
+
+```
+
+როგორც ხედავ დავამატეთ ფუნქცია სახელად removeTodoAt, რომელსაც გადაეცემა ინდექსი და წაშლის სიის ელემენტს შესაბამის ინდექსზე. ამ ახალ ფუნქციას ჩვენ onDismissed პარამეტრში გამოვიყენებთ:
+
+```dart
+
+    onDismissed: (direction) {
+      todos.removeTodoAt(index);
+    },
+
+```
