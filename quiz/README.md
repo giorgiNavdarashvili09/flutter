@@ -880,3 +880,250 @@ class ResultScreen extends StatelessWidget {
   }
 
 ```
+
+## სურათები ქვიზში
+
+ახლა მოდით ჩვენს კითხვებს დავამატოთ სურათები. ამ აპლიკაციაში სურათებს პროექტის ფოლდერში დავამატებთ(assets). ამისათვის პირველ რიგში პროექტის ფოლდერში შექმენი assets ფოლდერი და დაამატე შენს მიერ შერჩეული სურათები. (სურათების რაოდენობა უნდა ემთხვეოდეს ქვიზის კითხვების რაოდენობას). შემდეგ Flutter_ს უნდა ვუთხრათ თუ სად შეძლებს ჩვენს აპლიკაციაში სურათის ფაილების ნახვას. ამისათვის pubspec.yaml ფაილის ბოლოს დავამატებთ ორ ინსტრუქციას.
+
+![](assets/image2.png)
+
+ამ ინსტრუქციებით Flutter_ს ვეუბნებით, რომ პროექტისათვის საჭირო მედია ფაილებს იპოვის assets ფოლდერში. pubspec.yaml ფაილი სრულად ასე გამოიყურება:
+
+```yaml
+name: quiz_app
+description: A new Flutter project.
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.2
+
+flutter:
+  uses-material-design: true
+  assets:
+   - assets/
+  #  - images/a_dot_ham.jpeg
+  # fonts:
+  #   - family: Schyler
+  #     fonts:
+  #       - asset: fonts/Schyler-Regular.ttf
+  #       - asset: fonts/Schyler-Italic.ttf
+  #         style: italic
+  #   - family: Trajan Pro
+  #     fonts:
+  #       - asset: fonts/TrajanPro.ttf
+  #       - asset: fonts/TrajanPro_Bold.ttf
+  #         weight: 700
+
+```
+
+!!! არ გადააკოპირო ამ ფაილის შიგთავსი შენს პრეოქტში სრულად. გადაიტანე მხოლოდ ბოლო ნაწილი (flutter: ...)
+
+ახლა მოდით გადავაკეთოთ ჩვენი აპლიკაციის კოდი რათა კითხვებთან ერთად შესაბამისი სურათიც გამოვაჩინოთ
+
+პირველ რიგში მოდით შევცვალოთ Question კლასი:
+
+```dart
+class Question {
+  Question({
+    required this.question,
+    required this.answers,
+    required this.correctAnswer,
+    required this.imagePath,
+  });
+
+  final String question;
+  final List<String> answers;
+  final String correctAnswer;
+  final String imagePath;
+}
+```
+
+როგორც ხედავთ დავამატეთ კლასში ახალი ცვლადი სახელად imagePath, ასევე ამავე ცვლადს ვითხოვთ კლასის კონსტრუქტორში.
+
+შემდეგ ჩვენი ყოველი კითხვისათვის მოგვიწევს მივუთითოთ imagePath პარამეტრიც. ამ ცვლილების შემდეგ questions ცვლადი ასე გამოიყურება:
+
+```dart
+
+List<Question> questions = [
+  Question(
+      question: 'Flutter_ი იყენებს:',
+      answers: [
+        'python',
+        'java',
+        'dart',
+        'golang',
+      ],
+      correctAnswer: 'dart',
+      imagePath: 'assets/flutter.png'),
+  Question(
+      question: 'Flutter_ი შექმნილია:',
+      answers: [
+        'Amazon_ის მიერ',
+        'Google_ის მიერ',
+        'Facebook_ის მიერ',
+        'Github_ის მიერ',
+      ],
+      correctAnswer: 'Google_ის მიერ',
+      imagePath: 'assets/google.jpg'),
+  Question(
+      question: 'Dart_ი არის',
+      answers: [
+        'ფრეიმვორკი',
+        'ცხოველი',
+        'პროგრამირების ენა',
+        'კომპიუტერის ნაწილი',
+      ],
+      correctAnswer: 'პროგრამირების ენა',
+      imagePath: 'assets/dart.png'),
+];
+
+```
+
+ახლა მოდით გადავინაცვლოთ QuizPage კლასში და ჩვენთვის სასურველ ადგილზე ჩავამატოთ სურათის ვიჯეტი:
+
+```dart
+    SizedBox(
+      width: 150,
+      child: Image.asset(questions[index].imagePath),
+    )
+```
+
+1. აქ ვიყენებთ Image.asset კონსტრუქტორს, რომელსაც questens სიიდან ინდექსის დახმარებით სურათის მისამართს გადავცემთ.
+2. Image ვიჯეტი ჩავსვით SizedBox ვიჯეტში და გავუწერეთ width პარამეტრი რათა ყველა სურათი ერთი და იგივე ზომის იყოს.
+
+ამ ცლილებების შემდეგ სრული QuizPage ვიჯეტი ასე გამოიყურება:
+
+```dart
+
+import 'package:flutter/material.dart';
+import 'package:quiz_app/components/answer.dart';
+import 'package:quiz_app/data/question.dart';
+import 'package:quiz_app/screens/result.dart';
+
+class QuizPage extends StatefulWidget {
+  const QuizPage({Key? key}) : super(key: key);
+
+  @override
+  State<QuizPage> createState() => _QuizPageState();
+}
+
+class _QuizPageState extends State<QuizPage> {
+  int index = 0;
+  List<Color> colors = [
+    Colors.grey.shade300,
+    Colors.grey.shade300,
+    Colors.grey.shade300,
+    Colors.grey.shade300,
+  ];
+  bool alreadyAnswered = false;
+  int points = 0;
+
+  void nextQuestion() {
+    setState(() {
+      if (index < questions.length - 1) {
+        index++;
+      } else {
+        Navigator.push(context, MaterialPageRoute(builder: (context) {
+          return ResultScreen(points: points);
+        }));
+      }
+      alreadyAnswered = false;
+
+      colors = [
+        Colors.grey.shade300,
+        Colors.grey.shade300,
+        Colors.grey.shade300,
+        Colors.grey.shade300,
+      ];
+    });
+  }
+
+  void checkAnswer(int order) {
+    setState(() {
+      if (!alreadyAnswered) {
+        if (questions[index].correctAnswer == questions[index].answers[order]) {
+          colors[order] = Colors.green;
+          points++;
+        } else {
+          colors[order] = Colors.red;
+        }
+        alreadyAnswered = true;
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Container(
+          margin: EdgeInsets.symmetric(horizontal: 16),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('points: $points'),
+              SizedBox(
+                height: 16,
+              ),
+              SizedBox(
+                width: 150,
+                child: Image.asset(questions[index].imagePath),
+              ),
+              SizedBox(
+                height: 16,
+              ),
+              Text(questions[index].question),
+              SizedBox(
+                height: 24,
+              ),
+              Answer(
+                color: colors[0],
+                answer: questions[index].answers[0],
+                order: 0,
+                checkAnswer: checkAnswer,
+              ),
+              Answer(
+                color: colors[1],
+                answer: questions[index].answers[1],
+                order: 1,
+                checkAnswer: checkAnswer,
+              ),
+              Answer(
+                color: colors[2],
+                answer: questions[index].answers[2],
+                order: 2,
+                checkAnswer: checkAnswer,
+              ),
+              Answer(
+                color: colors[3],
+                answer: questions[index].answers[3],
+                order: 3,
+                checkAnswer: checkAnswer,
+              ),
+              TextButton(
+                  onPressed: () {
+                    nextQuestion();
+                  },
+                  child: Text('შემდეგი კითხვა'))
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+```
+
+თუ კი აპლიკაციას ემულატორში გატესტავ აღმოაჩენ, რომ შემდეგ კითხვაზე გადასვლისას სურათებიც იცვლება.
+
